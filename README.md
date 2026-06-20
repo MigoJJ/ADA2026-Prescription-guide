@@ -1,3 +1,5 @@
+claude --resume 2596350f-592a-4118-ac30-57821a200c37
+
 # ADA 2026 Type 2 Diabetes Prescription Advisor
 
 A modern, clinical decision support system (CDSS) developed as a JavaFX desktop application on Ubuntu. It implements the latest **ADA 2026 pharmacological treatment guidelines for Type 2 Diabetes**, prioritizing cardiovascular/renal organ protection alongside metabolic (glycemia and weight) optimization.

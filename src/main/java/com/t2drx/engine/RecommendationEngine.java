@@ -9,6 +9,13 @@ import java.util.List;
 
 public class RecommendationEngine {
 
+    // --- ADA 2026 Sulfonylurea (SU) policy thresholds ---
+    private static final int    SU_ELDERLY_CAUTION_AGE = 65;  // start-low caution in older adults
+    private static final int    SU_ELDERLY_AVOID_AGE   = 75;  // suppress SU (frailty / fall-risk proxy)
+    private static final double SU_EGFR_AVOID          = 30;  // severe CKD -> suppress SU
+    private static final double SU_EGFR_CKD_DRUGSWITCH = 60;  // prefer glipizide/gliclazide, avoid glyburide
+    private static final double SU_WEIGHT_CAUTION_BMI  = 30;  // weight-gain caution threshold
+
     public Recommendation evaluate(PatientData p) {
         Recommendation rec = new Recommendation();
         StringBuilder rationaleBuilder = new StringBuilder();
@@ -146,12 +153,15 @@ public class RecommendationEngine {
             if (isAboveA1cTarget) {
                 // If patient has cost concerns, prioritize low-cost oral agents (TZD, SU)
                 if (p.hasCostConcern()) {
-                    rationaleBuilder.append("  *Cost Considerations:* Given patient's cost concern, affordable generic options like Pioglitazone (TZD) or Glimepiride (Sulfonylurea) are recommended, though they require monitoring for weight gain (TZD, SU) and hypoglycemia (SU).\n");
+                    rationaleBuilder.append("  *Cost Considerations:* Given patient's cost concern, affordable generic options like Pioglitazone (TZD) or a Sulfonylurea are considered. Per ADA 2026, SU is a non-cardiorenal, low-cost glucose-lowering add-on and is deprioritized when frailty, advanced CKD, insulin use, hypoglycemia risk, or weight loss are priorities.\n");
                     if (!p.isOnTZD()) {
                         selectedAgents.add(createTzdCost());
                     }
-                    if (!p.isOnSU() && !p.hasHypoglycemiaRisk()) {
-                        selectedAgents.add(createSuCost());
+                    if (isSuitableForSu(p)) {
+                        selectedAgents.add(createSu(p.getEGFR(), p.getAge()));
+                        appendSuAppropriatenessCaveats(p, caveatsBuilder);
+                    } else {
+                        appendSuSuppressionCaveat(p, caveatsBuilder);
                     }
                 } else {
                     // Modern classes if not on them
@@ -227,6 +237,66 @@ public class RecommendationEngine {
         }
 
         return rec;
+    }
+
+    // --- SULFONYLUREA (SU) SUITABILITY & CAVEATS (ADA 2026) ---
+
+    /**
+     * ADA 2026 SU avoidance gate. SU is a low-cost, non-cardiorenal glucose-lowering
+     * add-on that is withheld when hypoglycemia risk, concurrent insulin, frailty
+     * (age proxy), or advanced CKD are present. BMI is handled as a caution, not a gate.
+     */
+    private boolean isSuitableForSu(PatientData p) {
+        return !p.isOnSU()
+                && !p.hasHypoglycemiaRisk()
+                && !p.isOnInsulin()
+                && p.getAge() < SU_ELDERLY_AVOID_AGE
+                && p.getEGFR() >= SU_EGFR_AVOID;
+    }
+
+    /**
+     * Explains why SU was withheld for an otherwise cost-concerned, above-target patient.
+     * Reason precedence mirrors ADA 2026 priority: hypoglycemia > insulin > frailty > advanced CKD.
+     */
+    private void appendSuSuppressionCaveat(PatientData p, StringBuilder caveatsBuilder) {
+        if (p.isOnSU()) {
+            return; // already prescribed; not a withheld-recommendation scenario
+        }
+        String reason;
+        if (p.hasHypoglycemiaRisk()) {
+            reason = "patient has elevated hypoglycemia risk";
+        } else if (p.isOnInsulin()) {
+            reason = "patient is on insulin (SU + insulin substantially increases hypoglycemia risk)";
+        } else if (p.getAge() >= SU_ELDERLY_AVOID_AGE) {
+            reason = "older adult (age ≥ " + SU_ELDERLY_AVOID_AGE + "): heightened frailty, falls, and hypoglycemia risk";
+        } else if (p.getEGFR() < SU_EGFR_AVOID) {
+            reason = "advanced CKD (eGFR < " + (int) SU_EGFR_AVOID + "): markedly increased hypoglycemia risk";
+        } else {
+            return;
+        }
+        caveatsBuilder.append("- **Sulfonylurea Withheld:** Despite cost considerations, a Sulfonylurea was not recommended because ")
+                .append(reason)
+                .append(". Prefer Metformin, TZD, or (if affordable) SGLT2i/GLP-1 RA.\n");
+    }
+
+    /**
+     * When SU is recommended, surface ADA 2026 appropriateness cautions: regular meals,
+     * CKD drug-choice (avoid glyburide), weight gain, and start-low dosing in older adults.
+     */
+    private void appendSuAppropriatenessCaveats(PatientData p, StringBuilder caveatsBuilder) {
+        caveatsBuilder.append("- **Sulfonylurea Appropriateness (ADA 2026):** Suitable as a low-cost add-on only with regular meal intake; counsel on hypoglycemia and weight gain. SU provides glucose lowering but no cardiorenal benefit.\n");
+        if (p.getEGFR() < SU_EGFR_CKD_DRUGSWITCH) {
+            caveatsBuilder.append("  *CKD Drug Choice (eGFR < ").append((int) SU_EGFR_CKD_DRUGSWITCH)
+                    .append("): prefer Gliclazide MR or Glipizide and avoid Glyburide/Glibenclamide; start at the lowest dose.*\n");
+        }
+        if (p.getAge() >= SU_ELDERLY_CAUTION_AGE) {
+            caveatsBuilder.append("  *Older Adult (age ≥ ").append(SU_ELDERLY_CAUTION_AGE)
+                    .append("): initiate at a low dose and monitor closely for hypoglycemia.*\n");
+        }
+        if (p.getBmi() >= SU_WEIGHT_CAUTION_BMI) {
+            caveatsBuilder.append("  *Obesity (BMI ≥ ").append((int) SU_WEIGHT_CAUTION_BMI)
+                    .append("): SU promotes weight gain; weigh against weight-neutral/loss alternatives.*\n");
+        }
     }
 
     private List<RecommendedAgent> deduplicateAgents(List<RecommendedAgent> agents) {
@@ -433,17 +503,35 @@ public class RecommendationEngine {
         );
     }
 
-    private RecommendedAgent createSuCost() {
+    private RecommendedAgent createSu(double egfr, int age) {
+        boolean ckd = egfr < SU_EGFR_CKD_DRUGSWITCH;
+        boolean elderly = age >= SU_ELDERLY_CAUTION_AGE;
+
+        String name = ckd
+                ? "Sulfonylurea (Gliclazide MR or Glipizide – preferred in CKD)"
+                : "Sulfonylurea (Gliclazide MR or Glimepiride)";
+
+        StringBuilder cautions = new StringBuilder(
+                "Significant risk of hypoglycemia and weight gain. Has 'beta-cell burnout' effect over years. Requires regular meal intake.");
+        if (ckd) {
+            cautions.append(" In CKD (eGFR < ").append((int) SU_EGFR_CKD_DRUGSWITCH)
+                    .append("), avoid Glyburide/Glibenclamide and use the lowest effective dose due to heightened hypoglycemia risk.");
+        }
+        if (elderly) {
+            cautions.append(" In older adults (age ≥ ").append(SU_ELDERLY_CAUTION_AGE)
+                    .append("), start low and monitor closely (falls, fracture, hypoglycemia unawareness).");
+        }
+
         return new RecommendedAgent(
-                "Sulfonylurea (Glimepiride or Glipizide)",
+                name,
                 "SU",
-                "Low Cost / Rapid Glycemic Efficacy",
+                "Low Cost / Rapid Glycemic Efficacy (non-cardiorenal)",
                 "Weight gain risk",
                 "High risk of hypoglycemia",
                 "Extremely Low Cost (Generic)",
                 "Oral, daily",
-                "Extremely cheap and widely available. Rapidly lowers blood glucose by stimulating pancreatic beta-cell insulin secretion.",
-                "Significant risk of hypoglycemia and weight gain. Has 'beta-cell burnout' effect over years.",
+                "Extremely cheap and widely available. Rapidly lowers blood glucose by stimulating pancreatic beta-cell insulin secretion. Consider when cost/access limits GLP-1 RA, SGLT2i, or DPP-4i and hypoglycemia risk is low with regular meals.",
+                cautions.toString(),
                 "card-glycemia"
         );
     }

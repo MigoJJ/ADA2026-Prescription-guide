@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.t2drx.controller.InputController" styleClass="main-container">
+    
+    <!-- Top Header -->
+    <top>
+        <VBox spacing="6" styleClass="header-bar">
+            <padding>
+                <Insets top="20" right="24" bottom="20" left="24"/>
+            </padding>
+            <Label text="ADA 2026 Type 2 Diabetes Prescription Advisor" styleClass="header-title"/>
+            <Label text="Clinical Decision Support System based on the 2026 Standards of Care in Diabetes" styleClass="header-subtitle"/>
+            <HBox styleClass="stepper-indicator" spacing="10">
+                <Label text="1. Patient Profile" styleClass="step-active"/>
+                <Label text="➔" styleClass="step-arrow"/>
+                <Label text="2. Recommendation Cards" styleClass="step-inactive"/>
+                <Label text="➔" styleClass="step-arrow"/>
+                <Label text="3. Clinical Report &amp; PDF" styleClass="step-inactive"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Center Content (TabPane) -->
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="content-tabpane">
+            <tabs>
+                <!-- Tab 1: Demographics & Basic Info -->
+                <Tab text="1. Demographics &amp; Liver">
+                    <content>
+                        <ScrollPane fitToWidth="true" styleClass="tab-scrollpane">
+                            <VBox spacing="20" styleClass="tab-content-vbox">
+                                <padding>
+                                    <Insets top="20" right="30" bottom="20" left="30"/>
+                                </padding>
+                                
+                                <Label text="Basic Patient Demographics" styleClass="section-header"/>
+                                <GridPane hgap="20" vgap="15" styleClass="form-grid">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="30"/>
+                                        <ColumnConstraints percentWidth="70"/>
+                                    </columnConstraints>
+                                    
+                                    <Label text="Patient Age (years):" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                                    <Spinner fx:id="ageSpinner" editable="true" prefWidth="200" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                    <Label text="Biological Sex:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                                    <ComboBox fx:id="sexComboBox" prefWidth="200" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                    <Label text="Body Mass Index (BMI, kg/m²):" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="field-label"/>
+                                    <Spinner fx:id="bmiSpinner" editable="true" prefWidth="200" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                </GridPane>
+
+                                <Separator/>
+
+                                <Label text="Liver Comorbidities" styleClass="section-header"/>
+                                <VBox spacing="10" styleClass="checkbox-group-box">
+                                    <CheckBox fx:id="masldCheckBox" text="High risk or screening-positive for MASLD / MASH (Metabolic Dysfunction-Associated Steatotic Liver Disease)"/>
+                                    <Label text="* Note: Positive screen or elevated Fib-4 score triggers specific GLP-1 RA/TZD hepatic-benefit pathways under the ADA 2026 guidelines." styleClass="field-help-text"/>
+                                </VBox>
+                            </VBox>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+
+                <!-- Tab 2: Cardiovascular & Renal Comorbidities -->
+                <Tab text="2. Cardiovascular &amp; Renal Risk">
+                    <content>
+                        <ScrollPane fitToWidth="true" styleClass="tab-scrollpane">
+                            <VBox spacing="20" styleClass="tab-content-vbox">
+                                <padding>
+                                    <Insets top="20" right="30" bottom="20" left="30"/>
+                                </padding>
+
+                                <Label text="Cardiovascular Risk Factors" styleClass="section-header"/>
+                                <VBox spacing="12" styleClass="checkbox-group-box">
+                                    <CheckBox fx:id="ascvdCheckBox" text="Established Atherosclerotic Cardiovascular Disease (ASCVD) - e.g., prior MI, stroke, revascularization"/>
+                                    <CheckBox fx:id="highCvdRiskCheckBox" text="High Cardiovascular Risk (Age ≥ 55 with ≥ 2 factors: obesity, hypertension, smoking, dyslipidemia, microalbuminuria)"/>
+                                </VBox>
+
+                                <Separator/>
+
+                                <Label text="Heart Failure Comorbidity" styleClass="section-header"/>
+                                <VBox spacing="12" styleClass="checkbox-group-box">
+                                    <CheckBox fx:id="hfCheckBox" text="Documented Heart Failure (HF) - NYHA Class II-IV"/>
+                                    
+                                    <HBox spacing="30" styleClass="sub-option-box">
+                                        <padding>
+                                            <Insets left="25"/>
+                                        </padding>
+                                        <fx:define>
+                                            <ToggleGroup fx:id="hfTypeGroup"/>
+                                        </fx:define>
+                                        <RadioButton fx:id="hfrefRadio" text="Heart Failure with Reduced Ejection Fraction (HFrEF)" toggleGroup="$hfTypeGroup"/>
+                                        <RadioButton fx:id="hfpefRadio" text="Heart Failure with Preserved Ejection Fraction (HFpEF)" toggleGroup="$hfTypeGroup"/>
+                                    </HBox>
+                                </VBox>
+
+                                <Separator/>
+
+                                <Label text="Chronic Kidney Disease (CKD)" styleClass="section-header"/>
+                                <VBox spacing="15" styleClass="checkbox-group-box">
+                                    <CheckBox fx:id="ckdCheckBox" text="Diagnosed Chronic Kidney Disease (CKD)"/>
+                                    
+                                    <GridPane hgap="20" vgap="12" styleClass="sub-form-grid">
+                                        <padding>
+                                            <Insets left="25"/>
+                                        </padding>
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="35"/>
+                                            <ColumnConstraints percentWidth="65"/>
+                                        </columnConstraints>
+                                        
+                                        <Label text="eGFR (mL/min/1.73m²):" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Spinner fx:id="egfrSpinner" editable="true" prefWidth="200" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                        <Label text="Urine Albumin-to-Creatinine Ratio (UACR, mg/g):" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                                        <Spinner fx:id="uacrSpinner" editable="true" prefWidth="200" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                    </GridPane>
+                                </VBox>
+                            </VBox>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+
+                <!-- Tab 3: Glycemia, Barriers & Current Meds -->
+                <Tab text="3. Metabolic Goals &amp; Meds">
+                    <content>
+                        <ScrollPane fitToWidth="true" styleClass="tab-scrollpane">
+                            <VBox spacing="20" styleClass="tab-content-vbox">
+                                <padding>
+                                    <Insets top="20" right="30" bottom="20" left="30"/>
+                                </padding>
+
+                                <HBox spacing="30">
+                                    <!-- Left: Goals & Barriers -->
+                                    <VBox spacing="15" HBox.hgrow="ALWAYS" styleClass="form-column">
+                                        <Label text="Glycemic &amp; Weight Goals" styleClass="section-header"/>
+                                        <GridPane hgap="15" vgap="12">
+                                            <columnConstraints>
+                                                <ColumnConstraints percentWidth="50"/>
+                                                <ColumnConstraints percentWidth="50"/>
+                                            </columnConstraints>
+                                            <Label text="Current HbA1c (%):" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
+                                            <Spinner fx:id="currentA1cSpinner" editable="true" prefWidth="130" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                            <Label text="Target HbA1c (%):" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
+                                            <Spinner fx:id="targetA1cSpinner" editable="true" prefWidth="130" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                        </GridPane>
+
+                                        <CheckBox fx:id="weightGoalCheckBox" text="Weight Management is a high priority"/>
+
+                                        <Separator/>
+
+                                        <Label text="Patient Barriers &amp; Preferences" styleClass="section-header"/>
+                                        <VBox spacing="10">
+                                            <CheckBox fx:id="hypoRiskCheckBox" text="High Hypoglycemia Risk (elderly, frail, history of falls/episodes)"/>
+                                            <CheckBox fx:id="costConcernCheckBox" text="Financial/Insurance barriers (prioritizes low-cost/generic)"/>
+                                            <CheckBox fx:id="oralCheckBox" text="Prefers oral medications (highly resistant to injections)"/>
+                                        </VBox>
+                                    </VBox>
+
+                                    <!-- Right: Existing Medications -->
+                                    <VBox spacing="15" HBox.hgrow="ALWAYS" styleClass="form-column">
+                                        <Label text="Current Antidiabetic Medications" styleClass="section-header"/>
+                                        <Label text="Select therapies the patient is already taking:" styleClass="field-help-text"/>
+                                        <VBox spacing="10" styleClass="meds-list-box">
+                                            <CheckBox fx:id="onMetformin" text="Metformin"/>
+                                            <CheckBox fx:id="onSglt2i" text="SGLT2 inhibitor (SGLT2i)"/>
+                                            <CheckBox fx:id="onGlp1" text="GLP-1 RA or dual GIP/GLP-1 RA"/>
+                                            <CheckBox fx:id="onDpp4" text="DPP-4 inhibitor (DPP-4i)"/>
+                                            <CheckBox fx:id="onSu" text="Sulfonylurea (SU)"/>
+                                            <CheckBox fx:id="onInsulin" text="Insulin"/>
+                                            <CheckBox fx:id="onTzd" text="Thiazolidinedione (TZD / Pioglitazone)"/>
+                                        </VBox>
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+
+    <!-- Bottom Action Area -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="15" styleClass="action-bar">
+            <padding>
+                <Insets top="15" right="24" bottom="20" left="24"/>
+            </padding>
+            <Button fx:id="evaluateButton" text="Evaluate &amp; Recommend" styleClass="primary-button"/>
+        </HBox>
+    </bottom>
+</BorderPane>

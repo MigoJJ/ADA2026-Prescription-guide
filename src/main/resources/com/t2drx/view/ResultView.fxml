@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.t2drx.controller.ResultController" styleClass="main-container">
+    
+    <!-- Top Header -->
+    <top>
+        <VBox spacing="6" styleClass="header-bar">
+            <padding>
+                <Insets top="20" right="24" bottom="20" left="24"/>
+            </padding>
+            <Label text="ADA 2026 Type 2 Diabetes Prescription Advisor" styleClass="header-title"/>
+            <Label text="Clinical Decision Support System based on the 2026 Standards of Care in Diabetes" styleClass="header-subtitle"/>
+            <HBox styleClass="stepper-indicator" spacing="10">
+                <Label text="1. Patient Profile" styleClass="step-inactive"/>
+                <Label text="➔" styleClass="step-arrow"/>
+                <Label text="2. Recommendation Cards" styleClass="step-active"/>
+                <Label text="➔" styleClass="step-arrow"/>
+                <Label text="3. Clinical Report &amp; PDF" styleClass="step-active"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Center Content -->
+    <center>
+        <HBox spacing="20">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+
+            <!-- Left Panel: Rationale and Caveats (EHR-Style side-panel) -->
+            <VBox spacing="15" prefWidth="350" minWidth="300" maxWidth="400" HBox.hgrow="NEVER" styleClass="left-results-panel">
+                <Label text="Primary Recommendation Summary" styleClass="results-section-header"/>
+                <Label fx:id="summaryHeaderLabel" wrapText="true" styleClass="summary-header-badge"/>
+                
+                <Separator/>
+
+                <Label text="Clinical Decision Rationale" styleClass="results-section-header"/>
+                <TextArea fx:id="rationaleTextArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" styleClass="rationale-text-area"/>
+
+                <!-- Caveats warnings container -->
+                <VBox fx:id="caveatsContainer" spacing="8" styleClass="caveats-box">
+                    <padding>
+                        <Insets top="12" right="16" bottom="12" left="16"/>
+                    </padding>
+                    <Label text="⚠ Clinical Warnings &amp; Cautions" styleClass="caveats-header"/>
+                    <Label fx:id="caveatsLabel" wrapText="true" styleClass="caveats-text"/>
+                </VBox>
+            </VBox>
+
+            <!-- Right Panel: Scrollable Flow of Drug Recommendation Cards -->
+            <VBox spacing="10" HBox.hgrow="ALWAYS">
+                <Label text="Recommended Medication Options" styleClass="results-section-header"/>
+                <Label text="Select therapies matching patient criteria. Ranked by organ-protection and weight targets:" styleClass="field-help-text"/>
+                
+                <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="cards-scrollpane" VBox.vgrow="ALWAYS">
+                    <FlowPane fx:id="cardsFlowPane" hgap="15" vgap="15" styleClass="cards-flowpane">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10"/>
+                        </padding>
+                        <!-- Cards are populated dynamically by the controller -->
+                    </FlowPane>
+                </ScrollPane>
+            </VBox>
+        </HBox>
+    </center>
+
+    <!-- Bottom Action Area -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="15" styleClass="action-bar">
+            <padding>
+                <Insets top="15" right="24" bottom="20" left="24"/>
+            </padding>
+            <Button fx:id="backButton" text="◀ Modify Patient Profile" styleClass="secondary-button"/>
+            <Button fx:id="exportPdfButton" text="⎙ Export PDF Report" styleClass="primary-button"/>
+        </HBox>
+    </bottom>
+</BorderPane>

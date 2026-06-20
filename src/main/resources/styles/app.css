@@ -1,0 +1,350 @@
+/* --- ADA 2026 T2D Rx Advisor - Custom CSS Theme --- */
+
+/* Root and Base styles */
+.root {
+    -fx-font-family: "Segoe UI", -apple-system, sans-serif;
+    -fx-font-size: 13px;
+    -color-bg-default: #F3F4F6;
+    -color-text-default: #1F2937;
+    -color-primary: #1E3A8A; /* Deep Navy */
+    -color-primary-hover: #172554;
+    -color-secondary: #4B5563; /* Slate */
+    -color-secondary-hover: #374151;
+    -color-card-bg: #FFFFFF;
+    -color-border: #E5E7EB;
+}
+
+.main-container {
+    -fx-background-color: -color-bg-default;
+}
+
+/* Header Bar */
+.header-bar {
+    -fx-background-color: #1E3A8A; /* EHR Navy blue */
+    -fx-background-radius: 0;
+}
+
+.header-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFFFFF;
+}
+
+.header-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #93C5FD; /* Light blue accent */
+}
+
+/* Stepper Indicator */
+.stepper-indicator {
+    -fx-padding: 8 0 0 0;
+}
+
+.step-active {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FBBF24; /* Warm yellow active state */
+}
+
+.step-inactive {
+    -fx-font-size: 12px;
+    -fx-text-fill: #93C5FD;
+    -fx-opacity: 0.7;
+}
+
+.step-arrow {
+    -fx-font-size: 11px;
+    -fx-text-fill: #93C5FD;
+    -fx-opacity: 0.5;
+}
+
+/* TabPane and ScrollPane */
+.content-tabpane {
+    -fx-background-color: transparent;
+}
+
+.content-tabpane > .tab-header-area {
+    -fx-padding: 10 24 0 24;
+    -fx-background-color: #1E3A8A;
+}
+
+.content-tabpane > .tab-header-area .tab {
+    -fx-background-color: #172554;
+    -fx-background-radius: 4 4 0 0;
+    -fx-padding: 8 16 8 16;
+}
+
+.content-tabpane > .tab-header-area .tab:selected {
+    -fx-background-color: -color-bg-default;
+}
+
+.content-tabpane > .tab-header-area .tab:selected .tab-label {
+    -fx-text-fill: -color-primary;
+    -fx-font-weight: bold;
+}
+
+.content-tabpane > .tab-header-area .tab .tab-label {
+    -fx-text-fill: #93C5FD;
+}
+
+.tab-scrollpane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.tab-scrollpane .viewport {
+    -fx-background-color: transparent;
+}
+
+.tab-content-vbox {
+    -fx-background-color: transparent;
+}
+
+/* Form Styles */
+.section-header {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E3A8A;
+    -fx-padding: 10 0 4 0;
+}
+
+.field-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+}
+
+.field-help-text {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6B7280;
+    -fx-font-style: italic;
+}
+
+.sub-option-box {
+    -fx-padding: 5 0 5 25;
+}
+
+.meds-list-box {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 15;
+}
+
+.checkbox-group-box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 15;
+}
+
+/* Spinner and ComboBox */
+.spinner, .combo-box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D5DB;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.spinner:focused, .combo-box:focused {
+    -fx-border-color: #2563EB;
+}
+
+/* Buttons and Action Area */
+.action-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB transparent transparent transparent;
+    -fx-border-width: 1;
+}
+
+.primary-button {
+    -fx-background-color: #2563EB; /* Vibrant accent blue */
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10 24 10 24;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #1D4ED8;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #1E40AF;
+}
+
+.secondary-button {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D5DB;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-text-fill: #374151;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #F9FAFB;
+    -fx-border-color: #9CA3AF;
+}
+
+/* Results Display Styling */
+.left-results-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 18;
+}
+
+.results-section-header {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E3A8A;
+}
+
+.summary-header-badge {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E3A8A;
+    -fx-background-color: #EFF6FF;
+    -fx-border-color: #BFDBFE;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 12 8 12;
+}
+
+.rationale-text-area {
+    -fx-font-family: monospace;
+    -fx-font-size: 12px;
+    -fx-text-fill: #1F2937;
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.caveats-box {
+    -fx-background-color: #FEF3C7; /* Soft gold warning background */
+    -fx-border-color: #FCD34D;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.caveats-header {
+    -fx-font-weight: bold;
+    -fx-text-fill: #92400E; /* Dark gold/amber */
+    -fx-font-size: 13px;
+}
+
+.caveats-text {
+    -fx-text-fill: #78350F;
+    -fx-font-size: 11.5px;
+}
+
+/* ScrollPanes for results */
+.cards-scrollpane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.cards-scrollpane .viewport {
+    -fx-background-color: transparent;
+}
+
+.cards-flowpane {
+    -fx-background-color: transparent;
+}
+
+/* --- DRUG CARD DESIGNS --- */
+.drug-card {
+    -fx-background-color: -color-card-bg;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 8, 0, 0, 4);
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+/* Column A (Cardiovascular & Renal Organ Protection): Deep Maroon/Red Theme */
+.card-cv {
+    -fx-background-color: #FFFDFD;
+    -fx-border-color: #FCA5A5 -color-border -color-border -color-border; /* Left border emulation */
+    -fx-border-width: 4 1 1 1;
+}
+
+.card-cv .card-title {
+    -fx-text-fill: #991B1B; /* Maroon */
+}
+
+/* Column B (Weight Optimization Focus): Purple/Magenta Theme */
+.card-weight {
+    -fx-background-color: #FAF5FF;
+    -fx-border-color: #D8B4FE -color-border -color-border -color-border;
+    -fx-border-width: 4 1 1 1;
+}
+
+.card-weight .card-title {
+    -fx-text-fill: #6B21A8; /* Deep Purple */
+}
+
+/* Glycemic Efficacy / Baseline Control: Clinical Teal Theme */
+.card-glycemia {
+    -fx-background-color: #F0FDF4;
+    -fx-border-color: #86EFAC -color-border -color-border -color-border;
+    -fx-border-width: 4 1 1 1;
+}
+
+.card-glycemia .card-title {
+    -fx-text-fill: #166534; /* Deep Forest Green */
+}
+
+/* Inner Card Typography */
+.card-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.card-subtitle {
+    -fx-font-size: 11px;
+    -fx-text-fill: #4B5563;
+    -fx-font-style: italic;
+}
+
+.section-mini-header {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E3A8A;
+    -fx-text-transform: uppercase;
+}
+
+.section-mini-header-caution {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #B91C1C;
+    -fx-text-transform: uppercase;
+}
+
+.card-body-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #374151;
+}
+
+.card-caution-text {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: #7F1D1D;
+    -fx-font-style: italic;
+}

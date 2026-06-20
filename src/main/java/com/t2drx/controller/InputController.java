@@ -4,6 +4,7 @@ import com.t2drx.App;
 import com.t2drx.engine.RecommendationEngine;
 import com.t2drx.model.PatientData;
 import com.t2drx.model.Recommendation;
+import com.t2drx.util.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -45,38 +46,83 @@ public class InputController {
     @FXML private CheckBox onTzd;
 
     @FXML private Button evaluateButton;
+    @FXML private ComboBox<String> languageComboBox;
 
     @FXML
     public void initialize() {
-        // Initialize ComboBox
-        sexComboBox.setItems(FXCollections.observableArrayList("Male", "Female", "Other"));
-        sexComboBox.setValue("Male");
+        LanguageManager lm = LanguageManager.getInstance();
+
+        // Initialize Language ComboBox
+        languageComboBox.setItems(FXCollections.observableArrayList("English", "한국어"));
+        languageComboBox.setValue("English");
+        languageComboBox.setOnAction(event -> handleLanguageChange());
+
+        // Initialize Sex ComboBox
+        sexComboBox.setItems(FXCollections.observableArrayList(
+            lm.getString("input.male"),
+            lm.getString("input.female"),
+            lm.getString("input.other")
+        ));
+        sexComboBox.setValue(lm.getString("input.male"));
 
         // Initialize Spinners with appropriate ranges
         ageSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(18, 120, 65));
         bmiSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(10.0, 60.0, 29.5, 0.5));
-        
+
         egfrSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(5.0, 150.0, 75.0, 5.0));
         uacrSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 5000.0, 15.0, 5.0));
-        
+
         currentA1cSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(4.0, 18.0, 8.2, 0.1));
         targetA1cSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(5.5, 9.0, 7.0, 0.1));
 
         // Bindings for Heart Failure subtypes
         hfrefRadio.disableProperty().bind(hfCheckBox.selectedProperty().not());
         hfpefRadio.disableProperty().bind(hfCheckBox.selectedProperty().not());
-        
+
         hfCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 hfrefRadio.setSelected(false);
                 hfpefRadio.setSelected(false);
             } else {
-                hfrefRadio.setSelected(true); // default if checked
+                hfrefRadio.setSelected(true);
             }
         });
 
         // Trigger action
         evaluateButton.setOnAction(event -> handleEvaluation());
+
+        updateUiLabels();
+    }
+
+    private void handleLanguageChange() {
+        String selected = languageComboBox.getValue();
+        if ("한국어".equals(selected)) {
+            LanguageManager.getInstance().setKorean();
+        } else {
+            LanguageManager.getInstance().setEnglish();
+        }
+        updateUiLabels();
+    }
+
+    private void updateUiLabels() {
+        LanguageManager lm = LanguageManager.getInstance();
+
+        evaluateButton.setText(lm.getString("input.evaluate"));
+
+        // Update sex combo box values
+        String currentSex = sexComboBox.getValue();
+        sexComboBox.setItems(FXCollections.observableArrayList(
+            lm.getString("input.male"),
+            lm.getString("input.female"),
+            lm.getString("input.other")
+        ));
+
+        // Restore previous selection or default
+        if (currentSex != null && sexComboBox.getItems().contains(currentSex)) {
+            sexComboBox.setValue(currentSex);
+        } else {
+            sexComboBox.setValue(lm.getString("input.male"));
+        }
     }
 
     private void handleEvaluation() {

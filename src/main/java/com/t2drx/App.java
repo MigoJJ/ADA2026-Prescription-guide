@@ -4,6 +4,7 @@ import com.t2drx.controller.InputController;
 import com.t2drx.controller.ResultController;
 import com.t2drx.model.PatientData;
 import com.t2drx.model.Recommendation;
+import com.t2drx.util.LanguageManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -28,14 +29,18 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         this.primaryStage = stage;
-        stage.setTitle("ADA 2026 Type 2 Diabetes Prescription Advisor");
-        
+        updateWindowTitle();
+
         // Minimize window size constraints for standard displays
         stage.setMinWidth(960);
         stage.setMinHeight(700);
 
         showInputView();
         stage.show();
+    }
+
+    private void updateWindowTitle() {
+        primaryStage.setTitle(LanguageManager.getInstance().getString("app.title"));
     }
 
     public void showInputView() {

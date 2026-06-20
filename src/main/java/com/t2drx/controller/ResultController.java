@@ -4,6 +4,7 @@ import com.t2drx.App;
 import com.t2drx.model.PatientData;
 import com.t2drx.model.Recommendation;
 import com.t2drx.model.Recommendation.RecommendedAgent;
+import com.t2drx.util.LanguageManager;
 import com.t2drx.util.PdfPageManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -36,7 +37,10 @@ public class ResultController {
 
     @FXML
     public void initialize() {
+        LanguageManager lm = LanguageManager.getInstance();
+        backButton.setText(lm.getString("result.back"));
         backButton.setOnAction(event -> App.getInstance().showInputView());
+        exportPdfButton.setText(lm.getString("result.exportPdf"));
         exportPdfButton.setOnAction(event -> handlePdfExport());
     }
 
@@ -158,52 +162,54 @@ public class ResultController {
     }
 
     private void generatePdf(File file) throws IOException {
+        LanguageManager lm = LanguageManager.getInstance();
         try (PDDocument doc = new PDDocument()) {
             PdfPageManager pageManager = new PdfPageManager(doc);
 
             // Title
-            pageManager.drawText("ADA 2026 Type 2 Diabetes Prescription Advisor",
+            pageManager.drawText(lm.getString("pdf.title"),
                     new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 18);
             pageManager.drawLine(1.5f);
 
             // Subtitle
             pageManager.addVerticalSpace(10);
-            pageManager.drawText("Patient Recommendation Report - Powered by ADA 2026 Decision Logic",
+            pageManager.drawText(lm.getString("pdf.subtitle"),
                     new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
 
             // Patient Details
             pageManager.addVerticalSpace(15);
-            pageManager.drawText("PATIENT PROFILE:",
+            pageManager.drawText(lm.getString("pdf.patientProfile") + ":",
                     new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
             pageManager.addVerticalSpace(5);
 
-            pageManager.drawText("Age: " + currentPatient.getAge() + "  |  Sex: " + currentPatient.getSex() +
+            pageManager.drawText(lm.getString("pdf.age") + ": " + currentPatient.getAge() + "  |  " +
+                    lm.getString("pdf.sex") + ": " + currentPatient.getSex() +
                     "  |  BMI: " + currentPatient.getBmi() + " kg/m\u00b2",
                     new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
 
-            pageManager.drawText("Labs: Current HbA1c: " + currentPatient.getCurrentHbA1c() + "% (Target: " +
-                    currentPatient.getTargetHbA1c() + "%)" + "  |  eGFR: " + currentPatient.getEGFR() +
+            pageManager.drawText(lm.getString("pdf.labs") + ": Current HbA1c: " + currentPatient.getCurrentHbA1c() +
+                    "% (Target: " + currentPatient.getTargetHbA1c() + "%)" + "  |  eGFR: " + currentPatient.getEGFR() +
                     " mL/min  |  UACR: " + currentPatient.getUacr() + " mg/g",
                     new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
 
             String comorbidities = (currentPatient.hasASCVD() ? "ASCVD, " : "") +
-                    (currentPatient.hasHighCVDRisk() ? "High CV Risk, " : "") +
-                    (currentPatient.hasHeartFailure() ? "Heart Failure, " : "") +
-                    (currentPatient.hasCKD() ? "CKD, " : "") +
-                    (currentPatient.hasMASLDRisk() ? "MASLD Risk" : "None specified");
-            pageManager.drawText("Comorbidities: " + comorbidities,
+                    (currentPatient.hasHighCVDRisk() ? lm.getString("clinical.ascvdRisk") + ", " : "") +
+                    (currentPatient.hasHeartFailure() ? lm.getString("clinical.heartFailure") + ", " : "") +
+                    (currentPatient.hasCKD() ? lm.getString("clinical.ckd") + ", " : "") +
+                    (currentPatient.hasMASLDRisk() ? lm.getString("clinical.masld") : lm.getString("pdf.none"));
+            pageManager.drawText(lm.getString("pdf.comorbidities") + ": " + comorbidities,
                     new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
 
             // Recommendation Summary
             pageManager.addVerticalSpace(15);
-            pageManager.drawText("THERAPEUTIC REGIMEN SUMMARY:",
+            pageManager.drawText(lm.getString("pdf.therapeuticSummary") + ":",
                     new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
             pageManager.drawText(currentRecommendation.getSummary(),
                     new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
 
             // Recommended Agents
             pageManager.addVerticalSpace(10);
-            pageManager.drawText("RECOMMENDED AGENTS:",
+            pageManager.drawText(lm.getString("pdf.recommendedAgents") + ":",
                     new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
             pageManager.addVerticalSpace(5);
 
@@ -213,9 +219,9 @@ public class ResultController {
                 pageManager.drawText("\u2022 " + agent.getName() + " (" + agent.getClassName() + ")",
                         50, new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 10);
 
-                String agentDetails = "Indication: " + agent.getClinicalIndication() +
-                        "  |  Weight Efficacy: " + agent.getWeightEfficacy() +
-                        "  |  Admin: " + agent.getAdministration();
+                String agentDetails = lm.getString("pdf.indication") + ": " + agent.getClinicalIndication() +
+                        "  |  " + lm.getString("pdf.weightEfficacy") + ": " + agent.getWeightEfficacy() +
+                        "  |  " + lm.getString("pdf.admin") + ": " + agent.getAdministration();
                 pageManager.drawWrappedText(agentDetails, 500,
                         new PDType1Font(Standard14Fonts.FontName.HELVETICA), 9, 90);
 
@@ -227,7 +233,7 @@ public class ResultController {
             if (caveats != null && !caveats.trim().isEmpty()) {
                 pageManager.checkAndCreateNewPageIfNeeded(20);
                 pageManager.addVerticalSpace(10);
-                pageManager.drawText("CLINICAL WARNINGS & CAVEATS:",
+                pageManager.drawText(lm.getString("pdf.warnings") + ":",
                         new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
 
                 String[] lines = caveats.split("\n");
@@ -241,7 +247,7 @@ public class ResultController {
 
             // Disclaimer
             pageManager.addVerticalSpace(15);
-            pageManager.drawText("Disclaimer: This tool provides recommendations based on ADA 2026 Guidelines. Clinical judgement must always be exercised.",
+            pageManager.drawText(lm.getString("pdf.disclaimer"),
                     new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE), 8);
 
             pageManager.close();

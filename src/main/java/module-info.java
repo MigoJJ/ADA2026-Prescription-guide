@@ -11,4 +11,5 @@ module com.t2drx {
     exports com.t2drx.model;
     exports com.t2drx.engine;
     exports com.t2drx.controller;
+    exports com.t2drx.util;
 }

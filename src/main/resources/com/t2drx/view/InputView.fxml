@@ -9,10 +9,14 @@
     
     <!-- Top Header -->
     <top>
-        <VBox spacing="6" styleClass="header-bar">
+        <VBox spacing="12" styleClass="header-bar">
             <padding>
                 <Insets top="20" right="24" bottom="20" left="24"/>
             </padding>
+            <HBox spacing="10" alignment="TOP_RIGHT">
+                <Label text="Language:" styleClass="field-label"/>
+                <ComboBox fx:id="languageComboBox" prefWidth="150"/>
+            </HBox>
             <Label text="ADA 2026 Type 2 Diabetes Prescription Advisor" styleClass="header-title"/>
             <Label text="Clinical Decision Support System based on the 2026 Standards of Care in Diabetes" styleClass="header-subtitle"/>
             <HBox styleClass="stepper-indicator" spacing="10">

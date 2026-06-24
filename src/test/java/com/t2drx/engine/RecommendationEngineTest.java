@@ -174,4 +174,83 @@ public class RecommendationEngineTest {
         assertTrue(hasTzd, "Should recommend TZD as low-cost glycemic option");
         assertFalse(hasSu, "Should NOT recommend Sulfonylurea due to hypoglycemia risk");
     }
+
+    private PatientData costConcernedAboveTarget() {
+        PatientData patient = new PatientData();
+        patient.setHasCostConcern(true);
+        patient.setCurrentHbA1c(8.5);
+        patient.setTargetHbA1c(7.0);
+        patient.setAge(50);
+        patient.setEGFR(90.0);
+        return patient;
+    }
+
+    private boolean hasSu(Recommendation rec) {
+        return rec.getAgents().stream().anyMatch(a -> a.getClassName().equals("SU"));
+    }
+
+    @Test
+    public void testSuOfferedStandardProfile() {
+        PatientData patient = costConcernedAboveTarget();
+
+        Recommendation rec = engine.evaluate(patient);
+
+        assertTrue(hasSu(rec), "SU should be offered for cost-concerned, above-target, low-risk patient");
+        assertTrue(rec.getClinicalCaveats().contains("Sulfonylurea Appropriateness"),
+                "Should surface SU appropriateness caveat (regular meals)");
+    }
+
+    @Test
+    public void testSuSuppressedWhenOnInsulin() {
+        PatientData patient = costConcernedAboveTarget();
+        patient.setOnInsulin(true);
+
+        Recommendation rec = engine.evaluate(patient);
+
+        assertFalse(hasSu(rec), "SU should be withheld when patient is on insulin");
+        assertTrue(rec.getClinicalCaveats().contains("Sulfonylurea Withheld"),
+                "Should explain SU was withheld");
+        assertTrue(rec.getClinicalCaveats().contains("insulin"),
+                "Suppression reason should mention insulin combination");
+    }
+
+    @Test
+    public void testSuSuppressedInElderly() {
+        PatientData patient = costConcernedAboveTarget();
+        patient.setAge(80);
+
+        Recommendation rec = engine.evaluate(patient);
+
+        assertFalse(hasSu(rec), "SU should be withheld for older adult (age >= 75)");
+        assertTrue(rec.getClinicalCaveats().contains("Sulfonylurea Withheld"),
+                "Should explain SU was withheld for older adult");
+    }
+
+    @Test
+    public void testSuSuppressedInSevereCKD() {
+        PatientData patient = costConcernedAboveTarget();
+        patient.setEGFR(25.0); // advanced CKD, eGFR < 30
+
+        Recommendation rec = engine.evaluate(patient);
+
+        assertFalse(hasSu(rec), "SU should be withheld in advanced CKD (eGFR < 30)");
+        assertTrue(rec.getClinicalCaveats().contains("Metformin Contraindication"),
+                "Severe CKD should also flag Metformin contraindication");
+    }
+
+    @Test
+    public void testSuDrugChoiceInModerateCKD() {
+        PatientData patient = costConcernedAboveTarget();
+        patient.setEGFR(45.0); // CKD but eGFR >= 30, SU still allowed with drug switch
+
+        Recommendation rec = engine.evaluate(patient);
+
+        assertTrue(hasSu(rec), "SU should still be offered in moderate CKD (eGFR 30-59)");
+        RecommendedAgent su = rec.getAgents().stream()
+                .filter(a -> a.getClassName().equals("SU")).findFirst().orElseThrow();
+        assertTrue(su.getName().contains("Gliclazide") || su.getName().contains("Glipizide"),
+                "CKD SU choice should prefer Gliclazide/Glipizide");
+        assertTrue(su.getCautions().contains("Glyburide") || su.getCautions().contains("Glibenclamide"),
+                "CKD SU cautions should warn against Glyburide/Glibenclamide");
+    }
 }
